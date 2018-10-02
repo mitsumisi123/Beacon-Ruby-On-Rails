@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resources :requests
+  resources :notifications
+  resources :user_tokens
   # get 'sessions/new'
   # get 'sessions/create'
   # get 'sessions/destroy'
@@ -58,6 +61,8 @@ Rails.application.routes.draw do
 
   #delete home member
   match 'users/user_homes/homes/:home_id', to: 'users#delete_home_member', via: [:delete]
+
+  match 'user_tokens', to: 'user_tokens#destroy_by_token', via: [:delete]
   # get "/test"  => "users#test"
   # #get home of user
   # # get  "/users/:id" => "homes#get_home_user" 

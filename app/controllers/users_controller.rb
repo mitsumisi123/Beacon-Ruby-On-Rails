@@ -42,11 +42,13 @@ class UsersController < ApplicationController
     # POST /register
   def register
     @user = User.create(user_params)
+    p @user.errors
     if @user.save
       response = { message: 'User created successfully'}
       render json: response, status: :created 
     else
-      render json: @user.errors, status: :bad
+      render json: @user.errors
+
     end 
   end
 
@@ -137,15 +139,20 @@ class UsersController < ApplicationController
           @status = @status.update(par)
           if @status
             render json: {message: 'fall'}
+            @message = {device: { id: @device[0]["id"], name: @device[0]["device_name"], motion: 'fail'} }
+            push_notification @message , @current_user
+            p "fall"
           else
             render json: @status.errors, status: :unprocessable_entity
           end
         else
           par = update_beacon_status_params[:status].dup
           par = par.merge({motion: "normal"})
-          p par
+          p "normal"
           @status = @status.update(par)
           if @status
+            @message = {device: { id: @device[0]["id"], name: @device[0]["device_name"], motion: 'normal'} }
+            push_notification @message , @current_user
             render json: {message: 'normal'}
           else
             render json: @status.errors, status: :unprocessable_entity
@@ -308,9 +315,14 @@ end
       command = AuthenticateUser.call(email, password)
 
       if command.success?
+        @user = user = User.find_by_email(email)
         render json: {
           access_token: command.result,
-          message: 'Login Successfully'
+          message: 'Login Successfully',
+          user_id: @user[:id],
+          email: @user[:email],
+          phone_number: @user[:phone_number],
+          user_name: @user[:username]
         }
       else
         render json: { error: command.errors }, status: :unauthorized
@@ -332,7 +344,7 @@ end
 
       
       @Advm = CMath.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
-      @angle = CMath.atan((CMath.sqrt(x1*x1 +z1*z1))/y1)*(180/Math::PI);
+      @angle = (CMath.atan((CMath.sqrt(x1*x1 +z1*z1))/y1)*(180/Math::PI)).abs;
       p @Advm
       p @angle
       if @Advm >= 1.4 && @angle >30
@@ -340,6 +352,11 @@ end
       else
         return false  
       end
+    end
+
+    def push_notification(message, user)
+      pusher = PushNotificationService.new(message,user)
+      pusher.deliver
     end
 
     

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_22_203535) do
+ActiveRecord::Schema.define(version: 2018_10_02_200513) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -29,6 +29,22 @@ ActiveRecord::Schema.define(version: 2018_07_22_203535) do
     t.text "location"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "requests", force: :cascade do |t|
+    t.bigint "owner_id"
+    t.bigint "sender_id"
+    t.bigint "home_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["home_id"], name: "index_requests_on_home_id"
   end
 
   create_table "rooms", force: :cascade do |t|
@@ -60,6 +76,14 @@ ActiveRecord::Schema.define(version: 2018_07_22_203535) do
     t.index ["user_id"], name: "index_user_homes_on_user_id"
   end
 
+  create_table "user_tokens", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "divice_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_tokens_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.text "email"
     t.text "password"
@@ -70,8 +94,11 @@ ActiveRecord::Schema.define(version: 2018_07_22_203535) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "notifications", "users"
+  add_foreign_key "requests", "homes"
   add_foreign_key "rooms", "homes"
   add_foreign_key "statuses", "devices"
   add_foreign_key "user_homes", "homes"
   add_foreign_key "user_homes", "users"
+  add_foreign_key "user_tokens", "users"
 end

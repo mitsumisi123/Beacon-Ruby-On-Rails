@@ -5,11 +5,15 @@ class User < ApplicationRecord
 	 validates :password, presence: true, on: :create
 
     has_secure_password validations: true
+    has_many :user_tokens
 
 	has_many :user_homes
 	has_many :homes, through: :user_homes
 
 	has_many :rooms, through: :homes
+
+	has_many :owner, :class_name =>'request', :foreign_key => 'owner_id'
+	has_many :sender,  :class_name =>'request', :foreign_key => 'sender_id'
 
 	def self.get_user_homes(user_id)
 		@user = User.find(user_id)
