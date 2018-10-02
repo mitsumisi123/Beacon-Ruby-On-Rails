@@ -5,7 +5,7 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
-#/.bundle
+/.bundle
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -14,9 +14,9 @@
 !/tmp/.keep
 
 # Ignore uploaded files in development
-#/storage/*
+/storage/*
 
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
-#/config/master.key
+/config/master.key
